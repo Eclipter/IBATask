@@ -1,16 +1,9 @@
 #define MAX_THREADS 4
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <pthread.h>
-#include <sched.h>
-#include <fcntl.h>
 #include <semaphore.h>
 #include <errno.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <dirent.h>
 #include <cstring>
 #include <sstream>
