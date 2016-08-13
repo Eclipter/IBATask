@@ -13,6 +13,7 @@
 using namespace std;
 
 sem_t thread_semaphore;
+pthread_mutex_t output_mutex;
 string data;
 vector<pthread_t> thread_vector;
 
@@ -35,7 +36,9 @@ void* scan_file(void* param) {
     }
 
     if(occurrences_count > 0) {
+        pthread_mutex_lock(&output_mutex);
         cout << "FILE: " << path << ". OCCURRENCES: " << occurrences_count << endl;
+        pthread_mutex_unlock(&output_mutex);
     }
 
     fin.close();
@@ -85,7 +88,9 @@ void search_in_folder(string path) {
 
         }
         else if(entry->d_type == DT_UNKNOWN) {
+            pthread_mutex_lock(&output_mutex);
             cout << "Unknown entry: " << entry->d_name << ", type: " << entry->d_type << endl;
+            pthread_mutex_lock(&output_mutex);
         }
     }
     closedir(directory);
@@ -111,6 +116,11 @@ int main() {
 			cerr << "ERROR: Failed to create semaphore." << endl;
 			return 1;
 		}
+
+        if(pthread_mutex_init(&output_mutex, NULL)) {
+            cerr << "ERROR: Failed to create mutex." << endl;
+            return 1;
+        }
 		
         search_in_folder(path);
 
@@ -123,6 +133,7 @@ int main() {
         cout << "Jobs complete!" << endl;
 
         sem_destroy(&thread_semaphore);
+        pthread_mutex_destroy(&output_mutex);
     }
     else if(errno == ENOENT) {
         cout << "Directory does not exist." << endl;
